@@ -57,7 +57,13 @@ const form = useForm({
     </AuthenticatedLayout>
     <!--Guest Layout (anyone not Nic)-->
     <GuestLayout v-else>
-
+        <div class="mt-6 bg-white shadow-sm rounded-lg divide-y">
+            <Review
+                v-for="review in reviews"
+                :key="review.id"
+                :review="review"
+            />
+        </div>
     </GuestLayout>
 </template>
  
