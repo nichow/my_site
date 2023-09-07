@@ -13,7 +13,9 @@ class ReviewController extends Controller
      */
     public function index()
     {
-        //
+        return Inertia::render('Reviews/Index', [
+            'reviews' => Review::all(),
+        ]);
     }
 
     /**
@@ -21,9 +23,7 @@ class ReviewController extends Controller
      */
     public function create()
     {
-        return Inertia::render('Review/Index', [
-            //
-        ]);
+        
     }
 
     /**
@@ -69,7 +69,16 @@ class ReviewController extends Controller
      */
     public function update(Request $request, Review $review)
     {
-        //
+        $validated = $request->validate([
+            'title' => 'required|string',
+            'subject' => 'required|string',
+            'rating' => 'required|int|max:5',
+            'content' => 'required|string',
+        ]);
+
+        $review->update($validated);
+        
+        return redirect(route('reviews.index'));
     }
 
     /**
@@ -77,6 +86,8 @@ class ReviewController extends Controller
      */
     public function destroy(Review $review)
     {
-        //
+        $review->delete();
+        
+        return redirect(route('reviews.index'));
     }
 }
