@@ -27,6 +27,14 @@ Route::get('/', function () {
     ]);
 });
 
+// temporary home route
+Route::get('/home', function () {
+    return Inertia::render('Home', [
+        'laravelVersion' => Application::VERSION,
+        'phpVersion' => PHP_VERSION,
+    ]);
+});
+
 Route::get('/dashboard', function () {
     return Inertia::render('Dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
