@@ -19,16 +19,6 @@ use Inertia\Inertia;
 */
 
 Route::get('/', function () {
-    return Inertia::render('Welcome', [
-        'canLogin' => Route::has('login'),
-        'canRegister' => Route::has('register'),
-        'laravelVersion' => Application::VERSION,
-        'phpVersion' => PHP_VERSION,
-    ]);
-});
-
-// temporary home route
-Route::get('/home', function () {
     return Inertia::render('Home', [
         'laravelVersion' => Application::VERSION,
         'phpVersion' => PHP_VERSION,
