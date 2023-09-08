@@ -1,0 +1,9 @@
+{
+    "compilerOptions": {
+      "outDir": "./built",
+      "allowJs": true,
+      "target": "es2022",
+      "skipLibCheck": true,
+    },
+    "include": ["./resources/**/*"]
+  }
