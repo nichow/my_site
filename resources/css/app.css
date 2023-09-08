@@ -1,3 +1,4 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+/* app.css is the 'master' file; what is imported by app.js */
+@import './components/components.css';
+@import './pages/pages.css';
+@import './home.css';
