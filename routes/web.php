@@ -1,8 +1,6 @@
 <?php
 
-use App\Http\Controllers\BlogController;
 use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\ReviewController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -19,7 +17,9 @@ use Inertia\Inertia;
 */
 
 Route::get('/', function () {
-    return Inertia::render('Home', [
+    return Inertia::render('Welcome', [
+        'canLogin' => Route::has('login'),
+        'canRegister' => Route::has('register'),
         'laravelVersion' => Application::VERSION,
         'phpVersion' => PHP_VERSION,
     ]);
@@ -28,20 +28,6 @@ Route::get('/', function () {
 Route::get('/dashboard', function () {
     return Inertia::render('Dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
-
-Route::resource('blog', BlogController::class)
-    ->only(['index']);
-
-Route::resource('blog', BlogController::class)
-    ->only(['store', 'update', 'destroy'])
-    ->middleware(['auth', 'verified']);
-
-Route::resource('reviews', ReviewController::class)
-    ->only(['index']);
-
-Route::resource('reviews', ReviewController::class)
-    ->only(['store', 'update', 'destroy'])
-    ->middleware(['auth', 'verified']);
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
