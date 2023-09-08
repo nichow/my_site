@@ -1,2 +1,4 @@
-@import './base.css';
+/* app.css is the 'master' file; what is imported by app.js */
+@import './components/components.css';
+@import './pages/pages.css';
 @import './home.css';

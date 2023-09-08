@@ -18,7 +18,7 @@ defineProps({
     <Head title="Nicolas Howe" />
     <AuthenticatedLayout>
         <div
-        class="main relative flex flex-col items-center min-h-screen bg-dots-darker bg-center bg-gray-100 dark:bg-dots-lighter dark:bg-gray-900 selection:bg-red-500 selection:text-white"
+        class="home relative flex flex-col items-center min-h-screen bg-dots-darker bg-center bg-gray-100 dark:bg-dots-lighter dark:bg-gray-900 selection:bg-red-500 selection:text-white"
         >
             <div class="my-container flex flex-col">
                 <h2 class="header-text text-gray-900 dark:text-white">Welcome to My Site!</h2>

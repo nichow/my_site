@@ -1,6 +1,6 @@
 @import './base.css';
 
-.main {
+.home {
     padding: theme('spacing.4') theme('spacing.6') 0;
     .my-container {
         margin-top: theme('spacing.6');
