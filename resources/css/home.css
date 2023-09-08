@@ -1,0 +1,22 @@
+@import './base.css';
+
+.main {
+    padding: theme('spacing.4') theme('spacing.6') 0;
+    .my-container {
+        margin-top: theme('spacing.6');
+        max-width: theme('maxWidth.5xl');
+        .header-text {
+            font-size: theme('fontSize.4xl');
+            font-weight: theme('fontWeight.semibold');
+
+            padding-bottom: theme('spacing.4');
+        }
+        .body-text {
+            font-size: theme('fontSize.2xl');
+            padding-left: theme('spacing.3');
+            p {
+                padding-bottom: theme('spacing.3');
+            }
+        }
+    }
+}
