@@ -81,9 +81,9 @@ const page = usePage<any>();
                             </Dropdown>
                         </div>
                     </div>
-                    <div class="hidden sm:flex sm:items-center sm:ml-6">
+                    <div v-if="page.props.auth.user" class="hidden sm:flex sm:items-center sm:ml-6">
                         <!-- Settings Dropdown -->
-                        <div class="ml-3 relative">
+                        <div class="admin-panel ml-3 relative">
                             <Dropdown align="right" width="48">
                                 <template #trigger>
                                     <span class="inline-flex rounded-md">
