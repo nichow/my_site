@@ -1,0 +1,24 @@
+@import '../base.css';
+
+.my-nav {
+    .lg-nav {
+        max-width: theme('maxWidth.7xl');
+        padding: 0 theme('spacing.4');
+
+        @media (min-width: theme('screens.sm')) {
+            padding: 0 theme('spacing.6');
+        }
+
+        @media (min-width: theme('screens.lg')) {
+            padding: 0 theme('spacing.8')
+        }
+    }
+
+    .responsive-nav {
+        .nav-bottom {
+            .socials {
+                width: 85%;
+            }
+        }
+    }
+}
