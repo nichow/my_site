@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { ref, onMounted } from 'vue';
+import { ref } from 'vue';
 import { Head } from '@inertiajs/vue3';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue'
 import TextCard from '@/Components/TextCard.vue';
@@ -19,10 +19,12 @@ type Card = {
     id: number,
     headerText: string,
     bodyText: string,
-    isActive: boolean
+    isActive?: boolean,
+    isAnimatingIn?: boolean,
+    isAnimatingOut?: boolean
 }
 
-const cards = ref([
+const cards = ref<Card[]>([
     { id: 0, headerText: 'Welcome to my Site!', bodyText: `My name is Nicolas Howe Garcia, and you've found my website! I am a software engineer with more hobbies than time. I use this site to showcase and document my personal projects; and also to host my blog, media reviews, and other various writings.
     
                     As of 2022 I've been employed by Nexxen (formerly Tremor Video) as a Technical Solutions Engineer for their demand side platform. I am not currently seeking new employment, but inquiries are always welcome. My resume is hosted here as well if needed.
@@ -38,19 +40,21 @@ const cards = ref([
     
                     Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.` }
 ]);
-const cardsRef = ref([]);
+const cardsRef = ref<Card[]>([]);
 let current : number = 0;
 
 function sideNavClick(id: number) {
-    (cardsRef.value[current] as Card).isActive = false;
-    (cardsRef.value[id] as Card).isActive = true;
-
-    current = id;
+    cardsRef.value[current].isAnimatingOut = true;
+    cardsRef.value[current].isAnimatingIn = false;
+    setTimeout(() => {
+        cardsRef.value[current].isActive = false;
+        cardsRef.value[current].isAnimatingOut = false;
+        cardsRef.value[id].isActive = true;
+        cardsRef.value[id].isAnimatingIn = true;
+        current = id;
+    }, 250)
 }
 
-onMounted(() => {
-    console.log(typeof cardsRef.value[0])
-});
 
 </script>
 
@@ -58,7 +62,6 @@ onMounted(() => {
     <Head title="Nicolas Howe" />
     <AuthenticatedLayout>
         <div
-        @change-text="(id: number) => console.log(id)"
         class="relative flex min-h-screen bg-dots-darker bg-center bg-gray-100 dark:bg-dots-lighter dark:bg-gray-900 selection:bg-red-500 selection:text-white"
         >
             <div class="side-nav flex flex-col p-6">
