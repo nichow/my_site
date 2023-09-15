@@ -1,1 +1,10 @@
 @import './base.css';
+
+.home {
+    .side-nav {
+        @media (min-width: theme('screens.lg')) {
+            min-width: 15%;
+        }
+        
+    }
+}

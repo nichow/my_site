@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import { ref } from 'vue';
 import { Head } from '@inertiajs/vue3';
+import { Card } from '@/Components/TextCard.vue'
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue'
 import TextCard from '@/Components/TextCard.vue';
 
@@ -15,24 +16,16 @@ defineProps({
     },
 });
 
-type Card = {
-    id: number,
-    headerText: string,
-    bodyText: string,
-    isActive?: boolean,
-    isAnimatingIn?: boolean,
-    isAnimatingOut?: boolean
-}
-
+// array of cards with text content for page
 const cards = ref<Card[]>([
-    { id: 0, headerText: 'Welcome to my Site!', bodyText: `My name is Nicolas Howe Garcia, and you've found my website! I am a software engineer with more hobbies than time. I use this site to showcase and document my personal projects; and also to host my blog, media reviews, and other various writings.
+    { id: 0, headerText: 'Welcome', bodyText: `My name is Nicolas Howe Garcia, and you've found my website! I am a software engineer with more hobbies than time. I use this site to showcase and document my personal projects; and also to host my blog, media reviews, and other various writings.
     
                     As of 2022 I've been employed by Nexxen (formerly Tremor Video) as a Technical Solutions Engineer for their demand side platform. I am not currently seeking new employment, but inquiries are always welcome. My resume is hosted here as well if needed.
     
                     I love media and writing about it! I'll review anything I feel the need to and host it all on this site, and I'll surely wax poetic about the subject on my blog. Go check out the archives if that interests you!
     
                     I do my best to update consistently, but sometimes life gets in the way.` },
-    { id: 1, headerText: 'Summary of the Site', bodyText: `As for this site, I built it with Laravel, using Vue.js for the front-end and Postgres for the database. I picked Laravel mostly to experiment, but I wanted something implementing a more traditional MVC pattern that also had the power to render nice looking SPAs like this. 
+    { id: 1, headerText: 'Site Summary', bodyText: `As for this site, I built it with Laravel, using Vue.js for the front-end and Postgres for the database. I picked Laravel mostly to experiment, but I wanted something implementing a more traditional MVC pattern that also had the power to render nice looking SPAs like this. 
                     
                     The Lorem ipsum text is derived from sections 1.10.32 and 1.10.33 of Cicero's De finibus bonorum et malorum.[7][8] The physical source may have been the 1914 Loeb Classical Library edition of De finibus, where the Latin text, presented on the left-hand (even) pages, breaks off on page 34 with
     
@@ -40,15 +33,25 @@ const cards = ref<Card[]>([
     
                     Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.` }
 ]);
+// array of references to card DOM objects
 const cardsRef = ref<Card[]>([]);
+// index of current card being displayed
 let current : number = 0;
 
+/**
+ * callback function for when side nav button is clicked
+ * @param id cardsRef index corresponding to button's header
+ */
 function sideNavClick(id: number) {
+    // animate old card out
     cardsRef.value[current].isAnimatingOut = true;
     cardsRef.value[current].isAnimatingIn = false;
+    // wait for completion of out animation
     setTimeout(() => {
+        // deactivate old card 
         cardsRef.value[current].isActive = false;
         cardsRef.value[current].isAnimatingOut = false;
+        // animate new card in, upcate current
         cardsRef.value[id].isActive = true;
         cardsRef.value[id].isAnimatingIn = true;
         current = id;
@@ -62,12 +65,13 @@ function sideNavClick(id: number) {
     <Head title="Nicolas Howe" />
     <AuthenticatedLayout>
         <div
-        class="relative flex min-h-screen bg-dots-darker bg-center bg-gray-100 dark:bg-dots-lighter dark:bg-gray-900 selection:bg-red-500 selection:text-white"
+        class="home flex flex-col sm:flex-row min-h-screen bg-dots-darker bg-center bg-gray-100 dark:bg-dots-lighter dark:bg-gray-900 selection:bg-red-500 selection:text-white"
         >
-            <div class="side-nav flex flex-col p-6">
+            <div class="side-nav flex flex-col p-6 mt-6">
                 <button 
-                class="dark:text-white bg-black mb-1"
                 v-for="card in cards"
+                class="dark:text-white bg-black mb-1"
+                :class="`side-nav-link-${card.id}`"
                 @click="sideNavClick(card.id)">
                     {{ card.headerText }}
                 </button>

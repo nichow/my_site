@@ -7,6 +7,7 @@ const props = defineProps({
     bodyText: String,
 });
 
+// construct css classObject, active is visibility
 const isActive = ref(false);
 const isAnimatingIn = ref(false);
 const isAnimatingOut = ref(false);
@@ -17,6 +18,7 @@ const classObject = computed(() => ({
     'animating-out': isAnimatingOut.value
 }))
 
+// 0 indexed card is considered the initial card to render
 onMounted(() => {
     isActive.value = props.cardId == 0 ? true: false;
 });
@@ -26,6 +28,15 @@ defineExpose({
     isAnimatingIn, 
     isAnimatingOut
 })
+
+export type Card = {
+    id: number,
+    headerText: string,
+    bodyText: string,
+    isActive?: boolean,
+    isAnimatingIn?: boolean,
+    isAnimatingOut?: boolean
+}
 
 </script>
 
