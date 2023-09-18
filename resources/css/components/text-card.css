@@ -1,7 +1,8 @@
-@import '../base.css';
+@import '../base/base.css';
 
 .text-card {
-    margin-top: theme('spacing.6');
+    display: none;
+    margin: theme('spacing.6') 0;
     max-width: theme('maxWidth.5xl');
     .header-text {
         font-size: theme('fontSize.4xl');
@@ -10,7 +11,37 @@
         padding-bottom: theme('spacing.4');
     }
     .body-text {
-        font-size: theme('fontSize.2xl');
+        font-size: theme('fontSize.xl');
         padding-left: theme('spacing.3');
+    }
+}
+
+.active {
+    display: flex;
+}
+
+.animating-in {
+    animation: .25s 1 forwards fadein;
+}
+
+.animating-out {
+    animation: .25s 1 forwards fadeout;
+}
+
+@keyframes fadein {
+    from {
+        opacity: 0%;
+    }
+    to {
+        opacity: 100%;
+    }
+}
+
+@keyframes fadeout {
+    from {
+        opacity: 100%;
+    }
+    to {
+        opacity: 0%;
     }
 }

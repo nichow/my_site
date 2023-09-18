@@ -1,0 +1,17 @@
+@import '../base/base.css';
+
+.home {
+    .side-nav {
+        @media (min-width: theme('screens.lg')) {
+            min-width: 15%;
+        }
+        .side-button {
+            width: 75%;
+            height: 2rem;
+            text-align: left;
+            border-bottom: 2px solid white;
+            transition: background-color .5s;
+            padding-left: theme('spacing.1')
+        }
+    }
+}
