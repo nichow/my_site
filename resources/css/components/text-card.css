@@ -1,4 +1,4 @@
-@import '../base.css';
+@import '../base/base.css';
 
 .text-card {
     display: none;
@@ -11,7 +11,7 @@
         padding-bottom: theme('spacing.4');
     }
     .body-text {
-        font-size: theme('fontSize.2xl');
+        font-size: theme('fontSize.xl');
         padding-left: theme('spacing.3');
     }
 }
