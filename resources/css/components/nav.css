@@ -1,5 +1,3 @@
-@import '../base/base.css';
-
 .my-nav {
     .lg-nav {
         max-width: theme('maxWidth.7xl');

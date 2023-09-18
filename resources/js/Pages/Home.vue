@@ -18,13 +18,13 @@ defineProps({
 
 // array of cards with text content for page
 const cards = ref<Card[]>([
-    { id: 0, headerText: 'Welcome', bodyText: `My name is Nicolas Howe Garcia, and you've found my website! I am a software engineer with more hobbies than time. I use this site to showcase and document my personal projects; and also to host my blog, media reviews, and other various writings.
+    { id: 0, headerText: 'Welcome', bodyText: `My name is Nicolas Howe Garcia, and you've found my website! I am a software engineer with more hobbies than time. I use this site to showcase and document my personal projects also to host my blog, media reviews, stories, etc. 
     
-    As of 2022 I've been employed by Nexxen (formerly Tremor Video) as a Technical Solutions Engineer for their demand side platform. I am not currently seeking new employment, but inquiries are always welcome. My resume is hosted here as well if needed.
+    As of 2022 I've been employed by Nexxen (formerly Tremor Video) as a Technical Solutions Engineer for their demand side platform. I am not currently seeking new employment, but inquiries are always welcome. Navigate to the resume page for additional details.
 
-    I love media and writing about it! I'll review anything I feel the need to and host it all on this site, and I'll surely wax poetic about the subject on my blog. Go check out the archives if that interests you!
+    My blog will mostly be development related, talking about my personal projects and documenting how I approach the design and implementation of their parts. I'm hoping that this will help me focus in on my projects, and forcing some periods of reflection will hopefully help me overcome hurdles.
 
-    I do my best to update consistently, but sometimes life gets in the way.` },
+    Sometimes I feel the burning need to review a game, movie, or album; and when that happens I'll post it here. Please keep in mind these are all going to be very subjective.` },
 
     { id: 1, headerText: 'Site Summary', bodyText: `As for this site, I built it with Laravel, using Vue.js for the front-end and Postgres for the database. I picked Laravel mostly to experiment, but I wanted something implementing a more traditional MVC pattern that also had the power to render nice looking SPAs like this. 
                     
@@ -71,8 +71,6 @@ function sideNavClick(id: number) {
         }, 250)
     }
 }
-
-
 </script>
 
 <template>
@@ -84,7 +82,9 @@ function sideNavClick(id: number) {
             <div class="side-nav flex flex-col p-6 mt-6">
                 <button 
                 v-for="card in cards"
-                class="side-button mx-auto dark:text-white bg-gray-100 dark:bg-gray-900 hover:bg-gray-500 mb-1"
+                class="side-button mx-auto 
+                bg-gray-100 hover:bg-gray-900 hover:text-white 
+                dark:bg-gray-900 dark:text-white dark:hover:bg-red-500"
                 @click="sideNavClick(card.id)">
                     {{ card.headerText }}
                 </button>

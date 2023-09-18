@@ -1,1 +1,2 @@
-@import './home.css'
+@import '../base/base.css';
+@import './home.css';

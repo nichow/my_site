@@ -1,0 +1,4 @@
+/* base css, imported by every other file, tailwind imports first */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
