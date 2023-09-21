@@ -1,7 +1,9 @@
 <script lang="ts" setup>
 import { onMounted } from 'vue';
 import { Actor } from './Actors/Actor';
+import { GameObject } from './GameObject';
 import { Player }  from './Actors/Player';
+import { Bullet } from './Damaging/Bullet'
 import { Enemy } from './Actors/Enemies/Enemy';
 import { Thing } from './Actors/Enemies/Thing';
 
@@ -10,68 +12,101 @@ class Controls {
     right: string = 'ArrowRight';
     up:    string = 'ArrowUp';
     down:  string = 'ArrowDown';
+
+    fleft:  string = 'a';
+    fright: string = 'd';
+    fup:    string = 'w';
+    fdown:  string = 's';
 }
 
 class LHF {
     private canvas: HTMLCanvasElement;
     private ctx: CanvasRenderingContext2D;
 
-    private static Player: Player = new Player();
-    private static Controls: Controls = new Controls();
-
-    private static Enemies: Array<Enemy> = []; 
+    private static player: Player = new Player();
+    private static controls: Controls = new Controls();
+    private static enemies: Array<Enemy> = []; 
 
     private static drawBG(ctx: CanvasRenderingContext2D) {
         ctx.fillStyle="black";
         ctx.fillRect(0, 0, 480, 480);
     }
 
-    private static drawActor(ctx: CanvasRenderingContext2D, a:Actor) {
-        let pos: [number, number] = a.getPos();
-        let size: [number, number] = a.getSize();
-        a.move();
-        ctx.fillStyle = a.color;
+    private static drawObject(ctx: CanvasRenderingContext2D, o:GameObject) {
+        let pos: [number, number] = o.getPos();
+        let size: [number, number] = o.getSize();
+        o.move();
+        ctx.fillStyle = o.color;
         ctx.fillRect(pos[0], pos[1], size[0], size[1])
     }
 
     private static drawPlayer(ctx: CanvasRenderingContext2D) {
-        LHF.drawActor(ctx, LHF.Player);
+        LHF.drawObject(ctx, LHF.player);
+    }
+
+    private static drawObjects(ctx: CanvasRenderingContext2D, objects: Array<GameObject>) {
+        let _arr: Array<GameObject> = [];
+        objects.map((o: GameObject)=>{
+            if (o.isAlive()) {
+                _arr.push(o);
+                LHF.drawObject(ctx, o);
+            }
+        });
+        return _arr;
     }
 
     private static drawEnemies(ctx: CanvasRenderingContext2D) {
-        let Arr: Array<Enemy> = LHF.Enemies;
-        Arr.map((e: Enemy) => {
-            LHF.drawActor(ctx, e);
-        })
+        LHF.enemies = LHF.drawObjects(ctx, LHF.enemies) as Array<Enemy>;
+    }
+
+    private static drawBullets(ctx: CanvasRenderingContext2D) {
+        LHF.player.bullets = LHF.drawObjects(ctx, LHF.player.bullets) as Array<Bullet>;
     }
 
     private static handleKey(which: boolean, key: string) {
-        let p: Player = LHF.Player;
+        let p: Player = LHF.player;
+        let c: Controls = LHF.controls;
         switch (key) {
-            case LHF.Controls.left: {
-                p.left = which ? true : false;
+            case c.left: {
+                p.left = which;
                 break;
             }
-            case LHF.Controls.right: {
-                p.right = which ? true : false;
+            case c.right: {
+                p.right = which;
                 break;
             }
-            case LHF.Controls.up: {
-                p.up = which ? true : false;
+            case c.up: {
+                p.up = which;
                 break;
             }
-            case LHF.Controls.down: {
-                p.down = which ? true : false;
+            case c.down: {
+                p.down = which;
+                break;
+            }
+            case c.fleft: {
+                p.fleft = which;
+                break;
+            }
+            case c.fright: {
+                p.fright = which;
+                break;
+            }
+            case c.fup: {
+                p.fup = which;
+                break;
+            }
+            case c.fdown: {
+                p.fdown = which;
                 break;
             }
         }
     }
 
-    private handleKeyDown(e : KeyboardEvent) {
+    private handleKeyDown(e: KeyboardEvent) {
         LHF.handleKey(true, e.key);
     }
 
-    private handleKeyUp(e : KeyboardEvent) {
+    private handleKeyUp(e: KeyboardEvent) {
         LHF.handleKey(false, e.key);
     }
 
@@ -87,7 +122,7 @@ class LHF {
         this.canvas = canvas;
         this.ctx = ctx;
         this.createEventHandlers();
-        LHF.Enemies.push(new Thing(100, 100));
+        LHF.enemies.push(new Thing(100, 100));
         setInterval(this.update, 10, this.ctx)
     }
 
@@ -95,6 +130,9 @@ class LHF {
         LHF.drawBG(ctx);
         LHF.drawPlayer(ctx);
         LHF.drawEnemies(ctx);
+        if(!LHF.player.recoiling)
+            LHF.player.fire();
+        LHF.drawBullets(ctx);
     }
 }
 
