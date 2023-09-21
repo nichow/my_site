@@ -104,4 +104,4 @@ onMounted(() => {
 </script>
 
 <template>
-</template>./Actors/Player
+</template>
