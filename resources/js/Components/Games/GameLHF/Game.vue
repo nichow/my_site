@@ -63,6 +63,15 @@ class LHF {
         LHF.player.bullets = LHF.drawObjects(ctx, LHF.player.bullets) as Array<Bullet>;
     }
 
+    private static collisionDetection(e: Event) {
+        let source = (e as CustomEvent).detail.source;
+        let target = (e as CustomEvent).detail.target;
+
+        if (source instanceof Bullet) {
+            (target as Enemy).damage();
+        }
+    }
+
     private static handleKey(which: boolean, key: string) {
         let p: Player = LHF.player;
         let c: Controls = LHF.controls;
@@ -113,6 +122,19 @@ class LHF {
     private createEventHandlers() {
         window.addEventListener('keydown', this.handleKeyDown);
         window.addEventListener('keyup', this.handleKeyUp);
+        window.addEventListener('collision', LHF.collisionDetection)
+    }
+    
+    update(ctx: CanvasRenderingContext2D) {
+        LHF.drawBG(ctx);
+        LHF.drawPlayer(ctx);
+        LHF.drawEnemies(ctx);
+        if(!LHF.player.isRecoiling())
+            LHF.player.fire();
+        LHF.drawBullets(ctx);
+        LHF.player.bullets.map((bullet) => {
+            bullet.collide(LHF.enemies);
+        });
     }
     
     constructor() {
@@ -126,14 +148,6 @@ class LHF {
         setInterval(this.update, 10, this.ctx)
     }
 
-    update(ctx: CanvasRenderingContext2D) {
-        LHF.drawBG(ctx);
-        LHF.drawPlayer(ctx);
-        LHF.drawEnemies(ctx);
-        if(!LHF.player.recoiling)
-            LHF.player.fire();
-        LHF.drawBullets(ctx);
-    }
 }
 
 onMounted(() => {

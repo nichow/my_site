@@ -4,22 +4,18 @@ import { Enemy } from "../Actors/Enemies/Enemy";
 export class Bullet extends Projectile {
     public readonly color: string = 'orange';
 
-    public move(): void {
-        super.move();
-        if (this.x == 480 || this.y == 480 || this.x == 0 || this.y == 0)
-            this.kill();
+    public collide(enemies: Array<Enemy>) {
+        enemies.map((enemy) => {
+            if (this.coll(enemy)) {
+                window.dispatchEvent(new CustomEvent("collision", {
+                    detail: { source: this, target: enemy }
+                })); 
+            }
+        });
     }
 
     constructor(x: number, y: number, l: boolean, r: boolean, u: boolean, d: boolean) {
-        super();
-        this.setPos([x, y])
-        this.w = 4;
-        this.h = 4;
-        this.v = 4;
-
-        this.right = r;
-        this.left = l;
-        this.down = d;
-        this.up = u;
+        super(x,y,l,r,u,d);
+        this.damage = 1;
     }
 }
