@@ -10,38 +10,30 @@ export class Mook extends Enemy {
     }
 
     private async chooseDirection() {
-        // result is 0-4; 0 is still, 1-4 are left, right, up, down
         let direction: number = Math.floor(Math.random() * 5);
         switch(direction) {
             case 0: {
-                this.left = false;
-                this.right = false;
-                this.up = false;
-                this.down = false;
-                break;
-            }
-            case 1: {
                 this.left = true;
                 this.right = false;
                 this.up = false;
                 this.down = false;
                 break;
             }
-            case 2: {
+            case 1: {
                 this.left = false;
                 this.right = true;
                 this.up = false;
                 this.down = false;
                 break;
             }
-            case 3: {
+            case 2: {
                 this.left = false;
                 this.right = false;
                 this.up = true;
                 this.down = false;
                 break;
             }
-            case 4: {
+            case 3: {
                 this.left = false;
                 this.right = false;
                 this.up = false;
@@ -50,7 +42,7 @@ export class Mook extends Enemy {
             }
         }
         // ms 
-        let ms: number = Math.floor(500 + Math.random() * 1500);
+        let ms: number = Math.floor(100 + Math.random() * 750);
         await this.waitfor(ms);
     }
 
@@ -58,8 +50,8 @@ export class Mook extends Enemy {
         super();
         this.x = x;
         this.y = y;
-        this.w = 20;
-        this.h = 30;
+        this.w = 10;
+        this.h = 15;
         this.v = 1;
         this.score = 100;
         this.wander();

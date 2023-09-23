@@ -8,7 +8,7 @@ import GameLHF from '@/Components/Games/GameLHF/Game.vue';
     <AuthenticatedLayout>
         <canvas 
         class="mx-auto mt-10" 
-        id="canvas" width="480" height="480"></canvas>
+        id="canvas" width="640" height="480"></canvas>
         <GameLHF/>
     </AuthenticatedLayout>
 </template>

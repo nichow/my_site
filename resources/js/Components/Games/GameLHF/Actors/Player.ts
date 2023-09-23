@@ -48,7 +48,7 @@ export class Player extends Actor {
 
     constructor() {
         super();
-        this.x = 240;
+        this.x = 320;
         this.y = 240;
         this.w = 10;
         this.h = 10;

@@ -6,7 +6,17 @@ import { Player }  from './Actors/Player';
 import { Bullet } from './Damaging/Bullet'
 import { Enemy } from './Actors/Enemies/Enemy';
 import { Mook } from './Actors/Enemies/Mook';
-import { mookLevel } from './Levels';
+import { Thing } from './Actors/Enemies/Thing';
+import { Family } from './Actors/Family/Family';
+import { Father } from './Actors/Family/Father';
+import { Mother } from './Actors/Family/Mother';
+import { Child } from './Actors/Family/Child';
+import { Level, mookLevel } from './Levels';
+
+class View {
+    public readonly WIDTH: number = 640;
+    public readonly HEIGHT: number = 480;
+}
 
 class Controls {
     left:  string = 'ArrowLeft';
@@ -19,73 +29,125 @@ class Controls {
     fup:    string = 'w';
     fdown:  string = 's';
 }
-
+/**
+ * LHF is the game manager, it sets up and draws the canvas/context,
+ * and contains the main update loop. Draws the BG, UI, and game objects;
+ * sets up event handlers, and handles most game logic
+ */
 class LHF {
     private canvas: HTMLCanvasElement;
     private ctx: CanvasRenderingContext2D;
 
     private static player: Player = new Player();
     private static controls: Controls = new Controls();
+    private static view: View = new View();
     private static enemies: Array<Enemy> = [];
+    private static family: Array<Family> = [];
+    private static saved: number = 0;
     private static score: number = 0;
     private static lives: number = 5;
     private static scene: number = 0;
     private static selected: number = 0;
     private static readonly menuOptions: number = 2;
 
+    /**
+     * randPos generates a random x,y coordinate not near 
+     * the player's start position of (240, 240)
+     * used to generate start positions of NPCs
+     * @returns tuple of 2 numbers: x and y coordinates
+     */
+    private static randPos(): [number, number] {
+        let x: number, y: number;
+        do {
+            x = 35 + Math.floor(Math.random() * 600);
+        } while (x >= 280 && x <= 360);
+        do {
+            y = 35 + Math.floor(Math.random() * 400);
+        } while (y >= 200 && y <= 280);
+        return [x, y]
+    }
+
+    /**
+     * update the game's scene to given
+     * @param scene scene being changed to
+     */
     private static sceneChange(scene: number) {
         LHF.scene = scene;
+        LHF.saved = 0;
+        let l: Level; 
         switch(scene % 5) {
             case 1: {
-                mookLevel.enemies.map((item) => {
-                    for (let i: number = 0; i < item.mook; i++) {
-                        let x: number = 35 + Math.floor(Math.random() * 400);
-                        let y: number = 35 + Math.floor(Math.random() * 390);
-                        LHF.enemies.push(new Mook(x, y));
-                    }
-                });
+                l = mookLevel;
+                break;
             }
+            default: {
+                l = mookLevel;
+                break;
+            }
+        }
+        let x: number, y: number;
+        for (let i: number = 0; i < l.mook; i++) {
+            [x, y] = LHF.randPos();
+            LHF.enemies.push(new Mook(x, y));
+        }
+        for (let i: number = 0; i < l.thing; i++) {
+            [x, y] = LHF.randPos();
+            LHF.enemies.push(new Thing(x, y));
+        }
+        for (let i: number = 0; i < l.father; i++) {
+            [x, y] = LHF.randPos()
+            LHF.family.push(new Father(x, y));
+        }
+        for (let i: number = 0; i < l.mother; i++) {
+            [x, y] = LHF.randPos()
+            LHF.family.push(new Mother(x, y));
+        }
+        for (let i: number = 0; i < l.child; i++) {
+            [x, y] = LHF.randPos()
+            LHF.family.push(new Child(x, y));
         }
     }
     
     private static drawBG(ctx: CanvasRenderingContext2D) {
+        let v: View = LHF.view;
         ctx.fillStyle="black";
-        ctx.fillRect(0, 0, 480, 480);
+        ctx.fillRect(0, 0, v.WIDTH, v.HEIGHT);
         ctx.strokeStyle="red";
-        ctx.strokeRect(20, 20, 440, 440);
+        ctx.strokeRect(20, 20, v.WIDTH - 40, v.HEIGHT - 40);
         ctx.strokeStyle="blue";
-        ctx.strokeRect(25, 25, 430, 430);
+        ctx.strokeRect(25, 25, v.WIDTH - 50, v.HEIGHT - 50);
         ctx.strokeStyle="yellow";
-        ctx.strokeRect(30, 30, 420, 420);
+        ctx.strokeRect(30, 30, v.WIDTH - 60, v.HEIGHT - 60);
     }
 
     private static drawUI(ctx: CanvasRenderingContext2D) {
+        let v: View = LHF.view;
         ctx.fillStyle="white";
         ctx.font = "bold 16px monospace"
         ctx.fillText("LAST HUMAN FAMILY", 15, 15);
-        ctx.fillText(`SCORE: ${LHF.score}`, 350, 15);
+        ctx.fillText(`SCORE: ${LHF.score}`, v.WIDTH - 130, 15);
 
-        ctx.fillText('LIVES: ', 175, 475);
+        ctx.fillText(`WAVE: ${LHF.scene}`, 85, v.HEIGHT - 5);
+        ctx.fillText('LIVES: ', 295, v.HEIGHT - 5);
         for (let i: number = 0; i < LHF.lives; ++i)
-            ctx.fillRect(230 + i * 15, 465, 10, 10);
+            ctx.fillRect(350 + i * 15, v.HEIGHT - 15, 10, 10);
     }
 
     private static drawMenu(ctx: CanvasRenderingContext2D) {
         ctx.fillStyle = "white";
         ctx.font = "bold 48px monospace"
-        ctx.fillText('LAST', 60, 125);
-        ctx.fillText('HUMAN FAMILY', 120, 175);
+        ctx.fillText('LAST HUMAN FAMILY', 100, 175);
 
         ctx.font = "bold 24px monospace"
-        ctx.fillText('START', 225, 275);
-        ctx.fillText('OPTIONS', 225, 300);
+        ctx.fillText('START', 300, 275);
+        ctx.fillText('OPTIONS', 300, 300);
         switch(LHF.selected) {
             case 0: {
-                ctx.fillRect(200, 265, 5, 5);
+                ctx.fillRect(275, 265, 5, 5);
                 break;
             }
             case 1: {
-                ctx.fillRect(200, 290, 5, 5);
+                ctx.fillRect(275, 290, 5, 5);
                 break;
             }
         }
@@ -94,8 +156,12 @@ class LHF {
     private static drawObject(ctx: CanvasRenderingContext2D, o:GameObject) {
         let pos: [number, number] = o.getPos();
         let size: [number, number] = o.getSize();
-        if (!LHF.player.halt)
-            o.move();
+        if (!LHF.player.halt) {
+            if (o instanceof Thing)
+                o.hunt(LHF.player.getPos());
+            if (!(o instanceof Family))
+                o.move();
+        }
         ctx.fillStyle = o.color;
         ctx.fillRect(pos[0], pos[1], size[0], size[1])
     }
@@ -123,6 +189,10 @@ class LHF {
         LHF.player.bullets = LHF.drawObjects(ctx, LHF.player.bullets) as Array<Bullet>;
     }
 
+    private static drawFamily(ctx: CanvasRenderingContext2D) {
+        LHF.family = LHF.drawObjects(ctx, LHF.family) as Array<Family>;
+    }
+
     private static handleCollision(e: Event) {
         let source = (e as CustomEvent).detail.source;
         let target = (e as CustomEvent).detail.target;
@@ -132,16 +202,25 @@ class LHF {
         }
     }
 
+    /**
+     * handler for death event
+     * not strictly "deaths" as saving family members triggers same event
+     * add score for enemies/family, remove life and respawn if player
+     * @param e event being handled, e.detail is the Actor dying
+     */
     private static handleDeath(e: Event) {
         let dead: Actor = (e as CustomEvent).detail;
 
         if (dead instanceof Enemy) {
             LHF.score += (dead as Enemy).getScore();
+        } else if (dead instanceof Family) {
+            // for family members, score = 1000 * number saved this level
+            LHF.score += ++LHF.saved * (dead as Family).getScore();
         } else if (dead instanceof Player) {
-            if (LHF.lives-- > 0) { 
+            if (--LHF.lives > 0) { 
                 LHF.player.revive();
             }
-        }
+        } 
     }
 
     private static handleKey(which: boolean, key: string) {
@@ -227,6 +306,7 @@ class LHF {
         else {
             LHF.drawUI(ctx);
             LHF.drawEnemies(ctx);
+            LHF.drawFamily(ctx);
             LHF.drawPlayer(ctx);
             if(!LHF.player.isRecoiling())
                 LHF.player.fire();
@@ -236,6 +316,9 @@ class LHF {
             });
             LHF.enemies.map((enemy) => {
                 enemy.collide(LHF.player);
+            })
+            LHF.family.map((member) => {
+                member.collide(LHF.player);
             })
         }
     }
@@ -258,4 +341,4 @@ onMounted(() => {
 </script>
 
 <template>
-</template>./Actors/Enemies/Mook
+</template>

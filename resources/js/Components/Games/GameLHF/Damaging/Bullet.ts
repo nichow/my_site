@@ -9,7 +9,8 @@ export class Bullet extends Projectile {
             if (this.coll(enemy)) {
                 window.dispatchEvent(new CustomEvent("collision", {
                     detail: { source: this, target: enemy }
-                })); 
+                }));
+                this.kill();
             }
         });
     }

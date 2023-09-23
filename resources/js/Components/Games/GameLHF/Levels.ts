@@ -1,13 +1,16 @@
-type LevelData = {
-    mook: number;
-}
 
-type Level = {
-    enemies: Array<LevelData>
+export type Level = {
+    mook: number,
+    thing: number,
+    father: number,
+    mother: number,
+    child: number
 }
 
 export const mookLevel: Level = {
-    enemies: [
-        { mook: 10 }
-    ]
+    mook: 7,
+    thing: 2,
+    father: 1,
+    mother: 1,
+    child: 2
 };
