@@ -1,5 +1,4 @@
 import { GameObject } from "../GameObject";
-import { Bullet } from "../Damaging/Bullet";
 
 export class Actor extends GameObject {
     protected health: number = 1;
@@ -9,10 +8,17 @@ export class Actor extends GameObject {
     public fdown: boolean = false;
     protected recoiling: boolean = false;
 
-    protected async recoil(ms: number) {
+    public async waitfor(ms: number) {
         return new Promise<void>((resolve) => {
             setTimeout(resolve, ms);
         });
+    }
+
+    protected kill() {
+        super.kill();
+        window.dispatchEvent(new CustomEvent("death", {
+            detail: this
+        }));
     }
 
     public damage(): void {
