@@ -20,7 +20,7 @@ export class GameObject {
         x = x < 30 ? 30 : x;
         x = x > 610 - this.w ? 610 - this.w : x;
         y = y < 30 ? 30 : y;
-        y = y > 610 - this.h ? 610 - this.h : y;
+        y = y > 450 - this.h ? 450 - this.h : y;
         this.x = x;
         this.y = y;
     }

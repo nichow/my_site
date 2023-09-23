@@ -19,15 +19,15 @@ class View {
 }
 
 class Controls {
-    left:  string = 'ArrowLeft';
-    right: string = 'ArrowRight';
-    up:    string = 'ArrowUp';
-    down:  string = 'ArrowDown';
+    left:  string = 'a';
+    right: string = 'd';
+    up:    string = 'w';
+    down:  string = 's';
 
-    fleft:  string = 'a';
-    fright: string = 'd';
-    fup:    string = 'w';
-    fdown:  string = 's';
+    fleft:  string = 'ArrowLeft';
+    fright: string = 'ArrowRight';
+    fup:    string = 'ArrowUp';
+    fdown:  string = 'ArrowDown';
 }
 /**
  * LHF is the game manager, it sets up and draws the canvas/context,
@@ -340,5 +340,4 @@ onMounted(() => {
 });
 </script>
 
-<template>
-</template>
+<template></template>
