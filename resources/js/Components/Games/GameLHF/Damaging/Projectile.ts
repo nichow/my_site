@@ -1,12 +1,11 @@
 import { GameObject } from '../GameObject';
-import { Actor } from '../Actors/Actor';
 
 export class Projectile extends GameObject {
     protected damage: number = 0;
 
     public move(): void {
         super.move();
-        if (this.x == 446 || this.y == 446 || this.x == 30 || this.y == 30)
+        if (this.x == 606 || this.y == 446 || this.x == 30 || this.y == 30)
             this.kill();
     }
 
