@@ -11,7 +11,7 @@ export class Thing extends Enemy {
         this.v = 0.25;
     }
 
-    public hunt(pPos: [number, number]) {
+    public hunt(pPos: [number, number]): void {
         if (pPos[0] < this.x) {
             this.left = true;
             this.right = false;

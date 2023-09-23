@@ -30,14 +30,14 @@ export class GameObject {
     }
 
     protected coll(tgt: GameObject): boolean {
-        let tgtPos: [number, number] = tgt.getPos();
-        let tgtSize: [number, number] = tgt.getSize();
-        let myBox = [this.x, this.x + this.w, this.y, this.y + this.h]
-        let tgtBox = [tgtPos[0], tgtPos[0] + tgtSize[0], tgtPos[1], tgtPos[1] + tgtSize[1]];
-        let collX: boolean = (myBox[0] <= tgtBox[1] && myBox[1] >= tgtBox[0]) || (myBox[0] >= tgtBox[1] && myBox[1] <= tgtBox[0])
+        let [_tx, _ty]: [number, number] = tgt.getPos();
+        let [_tw, _th]: [number, number] = tgt.getSize();
+        let [x, xw, y, yh] = [this.x, this.x + this.w, this.y, this.y + this.h]
+        let [tx, txw, ty, tyh] = [_tx, _tx + _tw, _ty, _ty + _th];
+        let collX: boolean = (x <= txw && xw >= tx) || (tx >= txw && xw <= tx)
         if (!collX)
             return false;
-        let collY: boolean = (myBox[2] <= tgtBox[3] && myBox[3] >= tgtBox[2]) || (myBox[2] >= tgtBox[3] && myBox[3] <= tgtBox[2])
+        let collY: boolean = (y <= tyh && yh >= ty) || (y >= tyh && yh <= ty)
         return collY;
     }
 
