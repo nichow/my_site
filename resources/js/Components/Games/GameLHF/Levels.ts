@@ -1,13 +1,13 @@
 type LevelData = {
-    thing: number;
+    mook: number;
 }
 
 type Level = {
     enemies: Array<LevelData>
 }
 
-export const thingLevel: Level = {
+export const mookLevel: Level = {
     enemies: [
-        { thing: 10 }
+        { mook: 10 }
     ]
 };

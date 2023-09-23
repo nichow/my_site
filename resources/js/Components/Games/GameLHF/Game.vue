@@ -5,8 +5,8 @@ import { GameObject } from './GameObject';
 import { Player }  from './Actors/Player';
 import { Bullet } from './Damaging/Bullet'
 import { Enemy } from './Actors/Enemies/Enemy';
-import { Thing } from './Actors/Enemies/Thing';
-import { thingLevel } from './Levels';
+import { Mook } from './Actors/Enemies/Mook';
+import { mookLevel } from './Levels';
 
 class Controls {
     left:  string = 'ArrowLeft';
@@ -37,11 +37,11 @@ class LHF {
         LHF.scene = scene;
         switch(scene % 5) {
             case 1: {
-                thingLevel.enemies.map((item) => {
-                    for (let i: number = 0; i < item.thing; i++) {
+                mookLevel.enemies.map((item) => {
+                    for (let i: number = 0; i < item.mook; i++) {
                         let x: number = 35 + Math.floor(Math.random() * 400);
                         let y: number = 35 + Math.floor(Math.random() * 390);
-                        LHF.enemies.push(new Thing(x, y));
+                        LHF.enemies.push(new Mook(x, y));
                     }
                 });
             }
@@ -258,4 +258,4 @@ onMounted(() => {
 </script>
 
 <template>
-</template>
+</template>./Actors/Enemies/Mook
