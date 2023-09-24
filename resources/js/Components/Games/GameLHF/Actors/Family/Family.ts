@@ -14,6 +14,7 @@ export class Family extends Actor {
                 this.alive = false;
             } else if (a instanceof Thing) {
                 this.kill();
+                a.hunting = false;
             }
         }
     }

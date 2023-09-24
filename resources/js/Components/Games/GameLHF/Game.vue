@@ -59,10 +59,10 @@ class LHF {
     private static randPos(): [number, number] {
         let x: number, y: number;
         do {
-            x = 35 + Math.floor(Math.random() * 600);
+            x = 35 + Math.floor(Math.random() * 550);
         } while (x >= 280 && x <= 360);
         do {
-            y = 35 + Math.floor(Math.random() * 400);
+            y = 35 + Math.floor(Math.random() * 350);
         } while (y >= 200 && y <= 280);
         return [x, y]
     }
@@ -86,14 +86,6 @@ class LHF {
             }
         }
         let x: number, y: number;
-        for (let i: number = 0; i < l.mook; i++) {
-            [x, y] = LHF.randPos();
-            LHF.enemies.push(new Mook(x, y));
-        }
-        for (let i: number = 0; i < l.thing; i++) {
-            [x, y] = LHF.randPos();
-            LHF.things.push(new Thing(x, y));
-        }
         for (let i: number = 0; i < l.father; i++) {
             [x, y] = LHF.randPos()
             LHF.family.push(new Father(x, y));
@@ -105,6 +97,14 @@ class LHF {
         for (let i: number = 0; i < l.child; i++) {
             [x, y] = LHF.randPos()
             LHF.family.push(new Child(x, y));
+        }
+        for (let i: number = 0; i < l.mook; i++) {
+            [x, y] = LHF.randPos();
+            LHF.enemies.push(new Mook(x, y));
+        }
+        for (let i: number = 0; i < l.thing; i++) {
+            [x, y] = LHF.randPos();
+            LHF.things.push(new Thing(x, y, LHF.player, LHF.family));
         }
     }
     
@@ -153,28 +153,50 @@ class LHF {
         }
     }
 
-    /**
-     * Draw given GameObject to the canvas, also processes movement
-     * @param ctx HTML canvas context
-     * @param o GameObject being drawn
-     */
     private static drawObject(ctx: CanvasRenderingContext2D, o:GameObject): void {
         let [x, y]: [number, number] = o.getPos();
         let [w, h]: [number, number] = o.getSize();
-        // halt is a global stop command, otherwise process movement.
-        if (!LHF.player.halt) {
-            if (o instanceof Thing)
-                o.hunt(LHF.player.getPos());
-            if (!(o instanceof Family))
-                o.move();
+        if(!LHF.player.halt && !(o instanceof Family)) {
+            o.move();
         }
-        // After movement is processed, draw
         ctx.fillStyle = o.color;
-        ctx.fillRect(x, y, w, h)
+        ctx.fillRect(x, y, w, h);
+    }
+
+    private static drawFamMember(ctx: CanvasRenderingContext2D, fam: Family): void {
+        fam.collide(LHF.player);
+        LHF.things.map((thing) => {
+            fam.collide(thing);
+        });
+        LHF.drawObject(ctx, fam);
+    }
+
+    private static drawBullet(ctx: CanvasRenderingContext2D, b: Bullet): void {
+        LHF.drawObject(ctx, b);
+        b.collide(LHF.enemies);
+    }
+
+    private static drawEnemy(ctx: CanvasRenderingContext2D, en: Enemy): void {
+        LHF.drawObject(ctx, en);
+        en.collide(LHF.player);
     }
 
     private static drawPlayer(ctx: CanvasRenderingContext2D): void {
         LHF.drawObject(ctx, LHF.player);
+    }
+
+    private static drawThing(ctx: CanvasRenderingContext2D, thing: Thing): void {
+        if (!LHF.player.halt) {
+            if (thing.hunting) {
+                thing.hunt();
+            } else {
+                let _arr: Array<Actor> = LHF.family;
+                _arr.push(LHF.player);
+                thing.changeTarget(_arr);
+                }
+            }
+            LHF.drawObject(ctx, thing);
+            thing.collide(LHF.player);
     }
 
     /**
@@ -185,29 +207,20 @@ class LHF {
      */
     private static drawObjects(ctx: CanvasRenderingContext2D, objects: Array<GameObject>): Array<GameObject> {
         let _arr: Array<GameObject> = [];
-        objects.map((o: GameObject)=>{
+        objects.map((o: GameObject) => {
             if (o.isAlive()) {
                 _arr.push(o);
-                LHF.drawObject(ctx, o);
+                if (o instanceof Bullet)
+                    LHF.drawBullet(ctx, o);
+                else if (o instanceof Thing)
+                    LHF.drawThing(ctx, o);
+                else if (o instanceof Enemy)
+                    LHF.drawEnemy(ctx, o);
+                else if (o instanceof Family)
+                    LHF.drawFamMember(ctx, o);
             }
         });
         return _arr;
-    }
-
-    private static drawEnemies(ctx: CanvasRenderingContext2D): void {
-        LHF.enemies = LHF.drawObjects(ctx, LHF.enemies) as Array<Enemy>;
-    }
-
-    private static drawThings(ctx: CanvasRenderingContext2D): void {
-        LHF.things = LHF.drawObjects(ctx, LHF.things) as Array<Thing>;
-    }
-
-    private static drawBullets(ctx: CanvasRenderingContext2D): void {
-        LHF.player.bullets = LHF.drawObjects(ctx, LHF.player.bullets) as Array<Bullet>;
-    }
-
-    private static drawFamily(ctx: CanvasRenderingContext2D): void {
-        LHF.family = LHF.drawObjects(ctx, LHF.family) as Array<Family>;
     }
 
     /**
@@ -253,6 +266,7 @@ class LHF {
      */
     private static handleKey(which: boolean, key: string): void {
         let c: Controls = LHF.controls;
+        let p: Player = LHF.player;
         // Scene 0 is the menu, only needs keydown commands
         if (LHF.scene == 0 && which) {
             switch (key) {
@@ -265,7 +279,7 @@ class LHF {
                 case c.down: {
                     // Keep upper bound and increment
                     // Right now I just hard code menuOptions to be the upper bound
-                    LHF.selected = LHF.selected < LHF.menuOptions ? LHF.menuOptions : LHF.selected + 1;
+                    LHF.selected = LHF.selected < LHF.menuOptions ? LHF.menuOptions - 1 : LHF.selected + 1;
                     break;
                 }
                 case 'Enter': {
@@ -274,11 +288,11 @@ class LHF {
                         // load level 1
                         LHF.sceneChange(1);
                     }
+                    break;
                 }
             }
         // General game controls for every other scene
         } else {
-            let p: Player = LHF.player;
             /**
              * Controls modify boolean properties on the Player object
              * keydown events set the corresponding property to true
@@ -343,28 +357,13 @@ class LHF {
             LHF.drawMenu(ctx);
         else {
             LHF.drawUI(ctx);
-            LHF.drawEnemies(ctx);
-            LHF.drawThings(ctx);
-            LHF.drawFamily(ctx);
+            LHF.enemies = LHF.drawObjects(ctx, LHF.enemies) as Array<Enemy>;
+            LHF.things = LHF.drawObjects(ctx, LHF.things) as Array<Thing>;
+            LHF.family = LHF.drawObjects(ctx, LHF.family) as Array<Family>;
+            LHF.player.bullets = LHF.drawObjects(ctx, LHF.player.bullets) as Array<Bullet>;
             LHF.drawPlayer(ctx);
             if(!LHF.player.isRecoiling())
                 LHF.player.fire();
-            LHF.drawBullets(ctx);
-            LHF.player.bullets.map((bullet) => {
-                bullet.collide(LHF.enemies);
-            });
-            LHF.enemies.map((enemy) => {
-                enemy.collide(LHF.player);
-            });
-            LHF.things.map((thing) => {
-                thing.collide(LHF.player);
-            });
-            LHF.family.map((member) => {
-                member.collide(LHF.player);
-                LHF.things.map((thing) => {
-                    member.collide(thing);
-                });
-            });
         }
     }
 
