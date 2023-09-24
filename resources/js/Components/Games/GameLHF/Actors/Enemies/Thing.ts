@@ -16,30 +16,37 @@ export class Thing extends Enemy {
     }
 
     public hunt(): void {
-        let [tx, ty]: [number, number] = this.target.getPos(); 
-        if (tx < this.x) {
-            this.left = true;
-            this.right = false;
-        } else if (tx > this.x) {
-            this.right = true;
-            this.left = false;
-        } else {
-            this.left = false;
-            this.right = false;
-        }
-        if (ty > this.y) {
-            this.down = true;
-            this.up = false;
-        } else if (ty < this.y) {
-            this.up = true; 
-            this.down = false;
-        } else {
-            this.up = false;
-            this.down = false;
+        if(!this.target.isAlive())
+            this.hunting = false;
+        else {
+            let [tx, ty]: [number, number] = this.target.getPos(); 
+            if (tx < this.x) {
+                this.left = true;
+                this.right = false;
+            } else if (tx > this.x) {
+                this.right = true;
+                this.left = false;
+            } else {
+                this.left = false;
+                this.right = false;
+            }
+            if (ty > this.y) {
+                this.down = true;
+                this.up = false;
+            } else if (ty < this.y) {
+                this.up = true; 
+                this.down = false;
+            } else {
+                this.up = false;
+                this.down = false;
+            }
         }
     }
 
     private distance(target: Actor): number {
+        if (!target.isAlive()) {
+            return Number.MAX_SAFE_INTEGER;
+        }
         const [x, y]: [number, number] = this.getPos();
         let [tx, ty]: [number, number] = target.getPos();
         const a: number = x - tx;
@@ -48,18 +55,12 @@ export class Thing extends Enemy {
         return c;
     }
 
-    public async changeTarget(potential: Array<Actor>) {
-        let _target: Actor = this.target;
-        let dist: number = _target.isAlive() ? this.distance(_target) : 1012;
-        _target = potential.reduce((newTarget, actor) => {
-            if (actor !== this.target) {
-                let testDist: number = this.distance(actor);
-                if (testDist < dist) {
-                    newTarget = actor;
-                    dist = testDist;
-                }
+    public changeTarget(potential: Array<Actor>) {
+        let _target: Actor = potential.reduce((newTarget, actor) => {
+            if (this.distance(newTarget) > this.distance(actor)) {
+                newTarget = actor;
             }
-            return newTarget ? newTarget : this.target;
+            return newTarget;
         });
         this.hunting = true;
         this.target = _target;

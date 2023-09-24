@@ -156,11 +156,12 @@ class LHF {
     private static drawObject(ctx: CanvasRenderingContext2D, o:GameObject): void {
         let [x, y]: [number, number] = o.getPos();
         let [w, h]: [number, number] = o.getSize();
+        ctx.fillStyle = o.color;
+        ctx.fillRect(x, y, w, h);
+
         if(!LHF.player.halt && !(o instanceof Family)) {
             o.move();
         }
-        ctx.fillStyle = o.color;
-        ctx.fillRect(x, y, w, h);
     }
 
     private static drawFamMember(ctx: CanvasRenderingContext2D, fam: Family): void {
@@ -174,6 +175,7 @@ class LHF {
     private static drawBullet(ctx: CanvasRenderingContext2D, b: Bullet): void {
         LHF.drawObject(ctx, b);
         b.collide(LHF.enemies);
+        b.collide(LHF.things);
     }
 
     private static drawEnemy(ctx: CanvasRenderingContext2D, en: Enemy): void {
@@ -193,8 +195,8 @@ class LHF {
                 let _arr: Array<Actor> = LHF.family;
                 _arr.push(LHF.player);
                 thing.changeTarget(_arr);
-                }
             }
+        }
             LHF.drawObject(ctx, thing);
             thing.collide(LHF.player);
     }
@@ -358,8 +360,8 @@ class LHF {
         else {
             LHF.drawUI(ctx);
             LHF.enemies = LHF.drawObjects(ctx, LHF.enemies) as Array<Enemy>;
-            LHF.things = LHF.drawObjects(ctx, LHF.things) as Array<Thing>;
             LHF.family = LHF.drawObjects(ctx, LHF.family) as Array<Family>;
+            LHF.things = LHF.drawObjects(ctx, LHF.things) as Array<Thing>;
             LHF.player.bullets = LHF.drawObjects(ctx, LHF.player.bullets) as Array<Bullet>;
             LHF.drawPlayer(ctx);
             if(!LHF.player.isRecoiling())
@@ -374,7 +376,7 @@ class LHF {
         this.canvas = canvas;
         this.ctx = ctx;
         this.createEventHandlers();
-        setInterval(this.update, 10, this.ctx)
+        setInterval(this.update, 15, this.ctx)
     }
 
 }
