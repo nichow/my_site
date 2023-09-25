@@ -17,10 +17,10 @@ export class GameObject {
     protected setPos(pos: [number, number]): void {
         let x: number = pos[0];
         let y: number = pos[1];
-        x = x < 30 ? 30 : x;
-        x = x > 610 - this.w ? 610 - this.w : x;
-        y = y < 30 ? 30 : y;
-        y = y > 450 - this.h ? 450 - this.h : y;
+        x = x < 31 ? 31 : x;
+        x = x > 609 - this.w ? 609 - this.w : x;
+        y = y < 31 ? 31 : y;
+        y = y > 449 - this.h ? 449 - this.h : y;
         this.x = x;
         this.y = y;
     }

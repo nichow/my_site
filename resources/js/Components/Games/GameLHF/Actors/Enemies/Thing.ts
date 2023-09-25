@@ -3,6 +3,8 @@ import { Actor } from '../Actor';
 import { Player } from '../Player';
 import { Family } from '../Family/Family';
 
+const v: number = .4;
+
 export class Thing extends Enemy {
     public readonly color: string = 'green';
     public hunting: boolean = false;
@@ -10,9 +12,9 @@ export class Thing extends Enemy {
 
     // can't be killed, can be slowed
     public async damage() {
-        this.v = 0.125;
+        this.v = v / 2;
         await this.waitfor(1000);
-        this.v = 0.25;
+        this.v = v;
     }
 
     public hunt(): void {
@@ -76,7 +78,7 @@ export class Thing extends Enemy {
         this.y = y; 
         this.w = 20;
         this.h = 30;
-        this.v = 0.25;
+        this.v = v;
         this.target = p;
         let potential: Array<Actor> = fam;
         potential.push(p);

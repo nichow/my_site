@@ -13,10 +13,18 @@ import { Mother } from './Actors/Family/Mother';
 import { Child } from './Actors/Family/Child';
 import { type Level, mookLevel } from './Levels';
 
-class View {
-    public readonly WIDTH: number = 640;
-    public readonly HEIGHT: number = 480;
+type rect = {
+    x: number,
+    y: number,
+    w: number,
+    h: number
 }
+
+const WIDTH: number = 640;
+const HEIGHT: number = 480;
+const BG: rect = {x: 0, y: 0, w:WIDTH, h:HEIGHT};
+const PLAYABLE: rect = {x:30, y:30, w:BG.w - 60, h:BG.h - 60};
+const SZ: rect = {x: 30, y: 30, w: PLAYABLE.w/4, h: PLAYABLE.h/3};
 
 class Controls {
     left:  string = 'a';
@@ -29,6 +37,7 @@ class Controls {
     fup:    string = 'ArrowUp';
     fdown:  string = 'ArrowDown';
 }
+
 /**
  * LHF is the game manager, it sets up and draws the canvas/context,
  * and contains the main update loop. Draws the BG, UI, and game objects;
@@ -37,16 +46,29 @@ class Controls {
 class LHF {
     private canvas: HTMLCanvasElement;
     private ctx: CanvasRenderingContext2D;
-
     private static player: Player = new Player();
-    private static controls: Controls = new Controls();
-    private static view: View = new View();
-    private static enemies: Array<Enemy> = [];
-    private static things: Array<Thing> = [];
-    private static family: Array<Family> = [];
-    private static saved: number = 0;
     private static score: number = 0;
     private static lives: number = 5;
+    private static controls: Controls = new Controls();
+    
+    private static family: Array<Family> = [];
+    private static readonly FAM_SZ: Array<rect> = [
+            {x: BG.w / 2 - 50, y: PLAYABLE.y, w: 100, h: 200},
+            {x: BG.w / 2 - 50, y: PLAYABLE.h - 200, w: 100, h: 200},
+            {x: PLAYABLE.x, y: BG.h / 2 - 50, w: 300, h: 200},
+            {x: PLAYABLE.w - 300, y: BG.h / 2 - 50, w: 300, h: 100}
+    ];
+    private static saved: number = 0;
+    
+    private static enemies: Array<Enemy> = [];
+    private static things: Array<Thing> = [];
+    private static readonly EN_SZ: Array<rect> = [
+        SZ,
+        {x: PLAYABLE.w - SZ.w, y: SZ.y, w: SZ.w, h: SZ.h},
+        {x: SZ.x, y: PLAYABLE.h - SZ.h, w: SZ.w, h: SZ.h},
+        {x: PLAYABLE.w - SZ.x, y: PLAYABLE.h - SZ.h, w: SZ.w, h: SZ.h}
+    ];       
+            
     private static scene: number = 0;
     private static selected: number = 0;
     private static readonly menuOptions: number = 2;
@@ -56,17 +78,39 @@ class LHF {
      * used to generate start positions of NPCs
      * @returns tuple of 2 numbers: x and y coordinates
      */
-    private static randPos(): [number, number] {
+    private static randPos(zone: rect): [number, number] {
         let x: number, y: number;
-        do {
-            x = 35 + Math.floor(Math.random() * 550);
-        } while (x >= 280 && x <= 360);
-        do {
-            y = 35 + Math.floor(Math.random() * 350);
-        } while (y >= 200 && y <= 280);
-        return [x, y]
+        x = zone.x + Math.floor(Math.random() * zone.w);
+        y = zone.y + Math.floor(Math.random() * zone.h);
+        return [x, y];
     }
 
+    private static spawnFam() {
+        let mySZ: rect; 
+        switch (LHF.family.length % 4) {
+            case 0: {
+                mySZ = LHF.FAM_SZ[0];
+                break;
+            }
+            case 1: {
+                mySZ = LHF.FAM_SZ[1];
+                break;
+            }
+            case 2: {
+                mySZ = LHF.FAM_SZ[2];
+                break;
+            }
+            case 3: {
+                mySZ = LHF.FAM_SZ[3];
+                break;
+            }
+            default: {
+                mySZ = PLAYABLE;
+            }
+        }
+        return mySZ;
+    }
+    
     /**
      * update the game's scene to given
      * @param scene scene being changed to
@@ -87,50 +131,70 @@ class LHF {
         }
         let x: number, y: number;
         for (let i: number = 0; i < l.father; i++) {
-            [x, y] = LHF.randPos()
+            [x, y] = LHF.randPos(LHF.spawnFam());
             LHF.family.push(new Father(x, y));
         }
         for (let i: number = 0; i < l.mother; i++) {
-            [x, y] = LHF.randPos()
+            [x, y] = LHF.randPos(LHF.spawnFam());
             LHF.family.push(new Mother(x, y));
         }
         for (let i: number = 0; i < l.child; i++) {
-            [x, y] = LHF.randPos()
+            [x, y] = LHF.randPos(LHF.spawnFam());
             LHF.family.push(new Child(x, y));
         }
-        for (let i: number = 0; i < l.mook; i++) {
-            [x, y] = LHF.randPos();
-            LHF.enemies.push(new Mook(x, y));
+        const numZones: number = this.EN_SZ.length;
+        let perZone: number = Math.floor(l.mook / numZones);
+        let rem: number = l.mook % numZones;
+        let mySZ: rect;
+        for (let i: number = 0; i < numZones; i++) {
+            mySZ = this.EN_SZ[i]; 
+            for (let j: number = 0; j < perZone; j++) {
+                [x, y] = LHF.randPos(mySZ);
+                LHF.enemies.push(new Mook(x, y));
+            }
+            if (rem--) {
+                [x, y] = LHF.randPos(mySZ);
+                LHF.enemies.push(new Mook(x, y));
+            }
         }
-        for (let i: number = 0; i < l.thing; i++) {
-            [x, y] = LHF.randPos();
-            LHF.things.push(new Thing(x, y, LHF.player, LHF.family));
+        perZone = Math.floor(l.thing / numZones); 
+        for (let i: number = 0; i < numZones; i++) {
+            mySZ = this.EN_SZ[i]; 
+            for (let j: number = 0; j < perZone; j++) {
+                [x, y] = LHF.randPos(mySZ);
+                LHF.things.push(new Thing(x, y, LHF.player, LHF.family));
+            }
+            if (rem--) {
+                [x, y] = LHF.randPos(mySZ);
+                LHF.things.push(new Thing(x, y, LHF.player, LHF.family));
+            }
         }
     }
     
     private static drawBG(ctx: CanvasRenderingContext2D): void {
-        let v: View = LHF.view;
         ctx.fillStyle="black";
-        ctx.fillRect(0, 0, v.WIDTH, v.HEIGHT);
+        ctx.fillRect(BG.x, BG.y, BG.w, BG.h);
         ctx.strokeStyle="red";
-        ctx.strokeRect(20, 20, v.WIDTH - 40, v.HEIGHT - 40);
+        let [x, y] = [20, 20];
+        ctx.strokeRect(x, y, BG.w - x * 2, BG.h - x * 2);
         ctx.strokeStyle="blue";
-        ctx.strokeRect(25, 25, v.WIDTH - 50, v.HEIGHT - 50);
+        [x, y] = [25, 25];
+        ctx.strokeRect(x, y, BG.w - x * 2, BG.h - x * 2);
         ctx.strokeStyle="yellow";
-        ctx.strokeRect(30, 30, v.WIDTH - 60, v.HEIGHT - 60);
+        let p: rect = PLAYABLE;
+        ctx.strokeRect(p.x, p.y, p.w, p.h);
     }
 
     private static drawUI(ctx: CanvasRenderingContext2D): void {
-        let v: View = LHF.view;
         ctx.fillStyle="white";
         ctx.font = "bold 16px monospace"
         ctx.fillText("LAST HUMAN FAMILY", 15, 15);
-        ctx.fillText(`SCORE: ${LHF.score}`, v.WIDTH - 130, 15);
+        ctx.fillText(`SCORE: ${LHF.score}`, BG.w - 130, 15);
 
-        ctx.fillText(`WAVE: ${LHF.scene}`, 85, v.HEIGHT - 5);
-        ctx.fillText('LIVES: ', 295, v.HEIGHT - 5);
+        ctx.fillText(`WAVE: ${LHF.scene}`, 85, BG.h - 5);
+        ctx.fillText('LIVES: ', 295, BG.h - 5);
         for (let i: number = 0; i < LHF.lives; ++i)
-            ctx.fillRect(350 + i * 15, v.HEIGHT - 15, 10, 10);
+            ctx.fillRect(350 + i * 15, BG.h - 15, 10, 10);
     }
 
     private static drawMenu(ctx: CanvasRenderingContext2D): void {
@@ -360,8 +424,8 @@ class LHF {
         else {
             LHF.drawUI(ctx);
             LHF.enemies = LHF.drawObjects(ctx, LHF.enemies) as Array<Enemy>;
-            LHF.family = LHF.drawObjects(ctx, LHF.family) as Array<Family>;
             LHF.things = LHF.drawObjects(ctx, LHF.things) as Array<Thing>;
+            LHF.family = LHF.drawObjects(ctx, LHF.family) as Array<Family>;
             LHF.player.bullets = LHF.drawObjects(ctx, LHF.player.bullets) as Array<Bullet>;
             LHF.drawPlayer(ctx);
             if(!LHF.player.isRecoiling())
