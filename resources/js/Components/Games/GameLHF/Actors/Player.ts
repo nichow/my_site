@@ -42,7 +42,7 @@ export class Player extends Actor {
 
     public async revive() {
         await this.blink(4, 500);
-        this.setPos([240, 240]);
+        this.setPos([320, 240]);
         await this.blink(4, 300);
         this.alive = true;
         this.halt = false;

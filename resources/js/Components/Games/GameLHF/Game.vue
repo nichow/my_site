@@ -48,15 +48,16 @@ class LHF {
     private ctx: CanvasRenderingContext2D;
     private static player: Player = new Player();
     private static score: number = 0;
+    private static hiScore: number = 0;
     private static lives: number = 5;
     private static controls: Controls = new Controls();
     
     private static family: Array<Family> = [];
     private static readonly FAM_SZ: Array<rect> = [
-            {x: BG.w / 2 - 25, y: PLAYABLE.y, w: 50, h: 200},
-            {x: BG.w / 2 - 25, y: PLAYABLE.h - 200, w: 50, h: 200},
-            {x: PLAYABLE.x, y: BG.h / 2 - 25, w: 300, h: 50},
-            {x: PLAYABLE.w - 300, y: BG.h / 2 - 25, w: 300, h: 50}
+            {x: BG.w / 2 - 50, y: PLAYABLE.y, w: 100, h: 100},
+            {x: BG.w / 2 - 50, y: PLAYABLE.h - 100, w: 100, h: 100},
+            {x: PLAYABLE.x, y: BG.h / 2 - 50, w: 150, h: 100},
+            {x: PLAYABLE.w - 150, y: BG.h / 2 - 50, w: 150, h: 100}
     ];
     private static saved: number = 0;
     
@@ -199,7 +200,7 @@ class LHF {
 
     private static drawUI(ctx: CanvasRenderingContext2D): void {
         ctx.fillStyle="white";
-        ctx.font = "bold 16px monospace"
+        ctx.font = "bold 16px monospace";
         ctx.fillText("LAST HUMAN FAMILY", 15, 15);
         ctx.fillText(`SCORE: ${LHF.score}`, BG.w - 130, 15);
 
@@ -211,7 +212,9 @@ class LHF {
 
     private static drawMenu(ctx: CanvasRenderingContext2D): void {
         ctx.fillStyle = "white";
-        ctx.font = "bold 48px monospace"
+        ctx.font = "bold 16px monospace";
+        ctx.fillText(`HI-SCORE: ${LHF.hiScore}`, BG.w - 350, 15);
+        ctx.font = "bold 48px monospace";
         ctx.fillText('LAST HUMAN FAMILY', 100, 175);
 
         ctx.font = "bold 24px monospace"
@@ -333,6 +336,10 @@ class LHF {
             // -1 life, revive player if more lives remain
             if (--LHF.lives > 0) { 
                 LHF.player.revive();
+            } else {
+                LHF.hiScore = LHF.score;
+                LHF.score = 0;
+                LHF.scene = 0;
             }
         } 
     }
