@@ -10,13 +10,25 @@ export class Thing extends Enemy {
     public hunting: boolean = false;
     private target: Actor;
 
+    private distance(target: Actor): number {
+        if (!target.isAlive()) {
+            return Number.MAX_SAFE_INTEGER;
+        }
+        const [x, y]: [number, number] = this.getPos();
+        const [tx, ty]: [number, number] = target.getPos();
+        const a: number = x - tx;
+        const b: number = y - ty;
+        const c: number = a * a + b * b;
+        return c;
+    }
+
     // can't be killed, can be slowed
     public async damage() {
         this.v = v / 2;
         await this.waitfor(1000);
         this.v = v;
     }
-
+    
     public hunt(): void {
         if(!this.target.isAlive())
             this.hunting = false;
@@ -45,17 +57,6 @@ export class Thing extends Enemy {
         }
     }
 
-    private distance(target: Actor): number {
-        if (!target.isAlive()) {
-            return Number.MAX_SAFE_INTEGER;
-        }
-        const [x, y]: [number, number] = this.getPos();
-        let [tx, ty]: [number, number] = target.getPos();
-        const a: number = x - tx;
-        const b: number = y - ty;
-        const c: number = Math.sqrt(a * a + b * b);
-        return c;
-    }
 
     public changeTarget(potential: Array<Actor>) {
         let _target: Actor = potential.reduce((newTarget, actor) => {

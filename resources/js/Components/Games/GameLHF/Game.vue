@@ -46,6 +46,7 @@ class Controls {
 class LHF {
     private canvas: HTMLCanvasElement;
     private ctx: CanvasRenderingContext2D;
+
     private static player: Player = new Player();
     private static score: number = 0;
     private static hiScore: number = 0;
@@ -264,6 +265,8 @@ class LHF {
 
     private static drawPlayer(ctx: CanvasRenderingContext2D): void {
         LHF.drawObject(ctx, LHF.player);
+        if(!LHF.player.isRecoiling())
+            LHF.player.fire();
     }
 
     private static drawThing(ctx: CanvasRenderingContext2D, thing: Thing): void {
@@ -276,8 +279,7 @@ class LHF {
                 thing.changeTarget(_arr);
             }
         }
-            LHF.drawObject(ctx, thing);
-            thing.collide(LHF.player);
+            LHF.drawEnemy(ctx, thing);
     }
 
     /**
@@ -302,6 +304,19 @@ class LHF {
             }
         });
         return _arr;
+    }
+
+    /**
+     * Draw UI and all game objects
+     * @param ctx HTML canvas context
+     */
+    private static drawGame(ctx: CanvasRenderingContext2D) {
+        LHF.drawUI(ctx);
+        LHF.enemies = LHF.drawObjects(ctx, LHF.enemies) as Array<Enemy>;
+        LHF.things = LHF.drawObjects(ctx, LHF.things) as Array<Thing>;
+        LHF.family = LHF.drawObjects(ctx, LHF.family) as Array<Family>;
+        LHF.player.bullets = LHF.drawObjects(ctx, LHF.player.bullets) as Array<Bullet>;
+        LHF.drawPlayer(ctx);
     }
 
     /**
@@ -336,6 +351,7 @@ class LHF {
             // -1 life, revive player if more lives remain
             if (--LHF.lives > 0) { 
                 LHF.player.revive();
+            // Otherwise reset game
             } else {
                 LHF.hiScore = LHF.score;
                 LHF.score = 0;
@@ -441,18 +457,9 @@ class LHF {
         if (LHF.scene == 0)
             LHF.drawMenu(ctx);
         else {
-            LHF.drawUI(ctx);
-            LHF.enemies = LHF.drawObjects(ctx, LHF.enemies) as Array<Enemy>;
-            LHF.things = LHF.drawObjects(ctx, LHF.things) as Array<Thing>;
-            LHF.family = LHF.drawObjects(ctx, LHF.family) as Array<Family>;
-            LHF.player.bullets = LHF.drawObjects(ctx, LHF.player.bullets) as Array<Bullet>;
-            LHF.drawPlayer(ctx);
-            if(!LHF.player.isRecoiling())
-                LHF.player.fire();
-
-            if (LHF.enemies.length === 0) {
+            LHF.drawGame(ctx);
+            if (LHF.enemies.length === 0)
                 LHF.sceneChange();
-            }
         }
     }
 

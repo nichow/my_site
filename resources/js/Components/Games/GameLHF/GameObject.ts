@@ -15,8 +15,7 @@ export class GameObject {
     public color: string = 'black';
 
     protected setPos(pos: [number, number]): void {
-        let x: number = pos[0];
-        let y: number = pos[1];
+        let [x, y] = pos;
         x = x < 30 ? 30 : x;
         x = x > 610 - this.w ? 610 - this.w : x;
         y = y < 30 ? 30 : y;
@@ -29,18 +28,30 @@ export class GameObject {
         this.alive = false;
     }
 
+    /**
+     * Check if this is colliding with another GameObject
+     * @param tgt other GameObject being checked
+     * @returns true if colliding, else false
+     */
     protected coll(tgt: GameObject): boolean {
-        let [_tx, _ty]: [number, number] = tgt.getPos();
-        let [_tw, _th]: [number, number] = tgt.getSize();
-        let [x, xw, y, yh] = [this.x, this.x + this.w, this.y, this.y + this.h]
-        let [tx, txw, ty, tyh] = [_tx, _tx + _tw, _ty, _ty + _th];
-        let collX: boolean = (x <= txw && xw >= tx) || (tx >= txw && xw <= tx)
+        // Get Target pos and size
+        const [_tx, _ty]: [number, number] = tgt.getPos();
+        const [_tw, _th]: [number, number] = tgt.getSize();
+        // Define bounding boxes
+        const [x, xw, y, yh] = [this.x, this.x + this.w, this.y, this.y + this.h]
+        const [tx, txw, ty, tyh] = [_tx, _tx + _tw, _ty, _ty + _th];
+        // Check if colliding on X axis
+        const collX: boolean = (x <= txw && xw >= tx) || (tx >= txw && xw <= tx)
         if (!collX)
             return false;
-        let collY: boolean = (y <= tyh && yh >= ty) || (y >= tyh && yh <= ty)
+        // Check if colliding on Y axis
+        const collY: boolean = (y <= tyh && yh >= ty) || (y >= tyh && yh <= ty)
         return collY;
     }
 
+    /**
+     * Checks movement flags on this and adjusts position by velocity
+     */
     public move(): void {
         let newX: number = this.x;
         let newY: number = this.y;
