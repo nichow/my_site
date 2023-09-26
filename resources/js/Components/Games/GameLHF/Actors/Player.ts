@@ -6,12 +6,12 @@ export class Player extends Actor {
     public bullets: Array<Bullet> = [];
     public halt: boolean = false;
     private invuln: boolean = false;
-    private readonly recoilTime: number = 150;
+    private readonly recoilTime: number = 200;
     
     public async fire() {
         const firing: boolean = this.fleft || this.fright || this.fdown || this.fup;
         if (firing && !this.recoiling && this.alive) {
-            this.bullets.push(new Bullet(this.x, this.y, this.fleft, this.fright, this.fup, this.fdown));
+            this.bullets.push(new Bullet(this.x+1, this.y+1, this.fleft, this.fright, this.fup, this.fdown));
             this.recoiling = true;
             await this.waitfor(this.recoilTime);
             this.recoiling = false;
@@ -34,6 +34,10 @@ export class Player extends Actor {
             super.kill();
             this.halt = true;
             this.invuln = true;
+    }
+
+    public reset() {
+        this.setPos([320, 240]);
     }
 
     public async revive() {

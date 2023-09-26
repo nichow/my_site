@@ -53,10 +53,10 @@ class LHF {
     
     private static family: Array<Family> = [];
     private static readonly FAM_SZ: Array<rect> = [
-            {x: BG.w / 2 - 50, y: PLAYABLE.y, w: 100, h: 200},
-            {x: BG.w / 2 - 50, y: PLAYABLE.h - 200, w: 100, h: 200},
-            {x: PLAYABLE.x, y: BG.h / 2 - 50, w: 300, h: 200},
-            {x: PLAYABLE.w - 300, y: BG.h / 2 - 50, w: 300, h: 100}
+            {x: BG.w / 2 - 25, y: PLAYABLE.y, w: 50, h: 200},
+            {x: BG.w / 2 - 25, y: PLAYABLE.h - 200, w: 50, h: 200},
+            {x: PLAYABLE.x, y: BG.h / 2 - 25, w: 300, h: 50},
+            {x: PLAYABLE.w - 300, y: BG.h / 2 - 25, w: 300, h: 50}
     ];
     private static saved: number = 0;
     
@@ -71,7 +71,7 @@ class LHF {
             
     private static scene: number = 0;
     private static selected: number = 0;
-    private static readonly menuOptions: number = 2;
+    private static readonly MENU: number = 2;
 
     /**
      * randPos generates an x,y coordinate not near the player's start position
@@ -84,8 +84,14 @@ class LHF {
         y = zone.y + Math.floor(Math.random() * zone.h);
         return [x, y];
     }
-
-    private static spawnFam() {
+    
+    /**
+     * Generate a position for a family spawn
+     * Family members spawn towards the axes around the center
+     * Puts one in each zone, clockwise from top 
+     * @returns The bounds of the spawn zone
+     */
+    private static spawnFam(): rect {
         let mySZ: rect; 
         switch (LHF.family.length % 4) {
             case 0: {
@@ -115,9 +121,13 @@ class LHF {
      * update the game's scene to given
      * @param scene scene being changed to
      */
-    private static sceneChange(scene: number): void {
-        LHF.scene = scene;
+    private static sceneChange(): void {
+        // Reset player pos, things, and saved counter
+        LHF.player.reset();
+        LHF.things = [];
         LHF.saved = 0;
+        // Increment scene
+        let scene = ++LHF.scene;
         let l: Level; 
         switch(scene % 5) {
             case 1: {
@@ -130,6 +140,7 @@ class LHF {
             }
         }
         let x: number, y: number;
+        // Add level's family members
         for (let i: number = 0; i < l.father; i++) {
             [x, y] = LHF.randPos(LHF.spawnFam());
             LHF.family.push(new Father(x, y));
@@ -142,10 +153,11 @@ class LHF {
             [x, y] = LHF.randPos(LHF.spawnFam());
             LHF.family.push(new Child(x, y));
         }
+        // Add level enemies, distributed through zones
         const numZones: number = this.EN_SZ.length;
-        let perZone: number = Math.floor(l.mook / numZones);
         let rem: number = l.mook % numZones;
         let mySZ: rect;
+        let perZone: number = Math.floor(l.mook / numZones);
         for (let i: number = 0; i < numZones; i++) {
             mySZ = this.EN_SZ[i]; 
             for (let j: number = 0; j < perZone; j++) {
@@ -337,22 +349,22 @@ class LHF {
         if (LHF.scene == 0 && which) {
             switch (key) {
                 // selected is a number which tells the game which option is selected
-                case c.up: {
+                case c.up || c.fup: {
                     // Keep lower bound and decrement
                     LHF.selected = LHF.selected == 0 ? 0 : LHF.selected - 1;
                     break;
                 }
-                case c.down: {
+                case c.down || c.fdown: {
                     // Keep upper bound and increment
-                    // Right now I just hard code menuOptions to be the upper bound
-                    LHF.selected = LHF.selected < LHF.menuOptions ? LHF.menuOptions - 1 : LHF.selected + 1;
+                    // Right now I just hard code MENU to be the upper bound
+                    LHF.selected = LHF.selected < LHF.MENU ? LHF.MENU - 1 : LHF.selected + 1;
                     break;
                 }
                 case 'Enter': {
                     // selected == 0 is start game
                     if (LHF.selected == 0) {
                         // load level 1
-                        LHF.sceneChange(1);
+                        LHF.sceneChange();
                     }
                     break;
                 }
@@ -430,6 +442,10 @@ class LHF {
             LHF.drawPlayer(ctx);
             if(!LHF.player.isRecoiling())
                 LHF.player.fire();
+
+            if (LHF.enemies.length === 0) {
+                LHF.sceneChange();
+            }
         }
     }
 

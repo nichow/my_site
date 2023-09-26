@@ -5,7 +5,7 @@ export class Projectile extends GameObject {
 
     public move(): void {
         super.move();
-        if (this.x == 605 || this.y == 445 || this.x == 31 || this.y == 31)
+        if (this.x == 606 || this.y == 446 || this.x == 30 || this.y == 30)
             this.kill();
     }
 
