@@ -114,14 +114,14 @@ class LHF {
             }
             default: {
                 mySZ = PLAYABLE;
+                break;
             }
         }
         return mySZ;
     }
     
     /**
-     * update the game's scene to given
-     * @param scene scene being changed to
+     * Iterate to next level
      */
     private static sceneChange(): void {
         // Reset player pos, things, and saved counter
@@ -158,19 +158,20 @@ class LHF {
         // Add level enemies, distributed through zones
         const numZones: number = this.EN_SZ.length;
         let rem: number = l.mook % numZones;
-        let mySZ: rect;
         let perZone: number = Math.floor(l.mook / numZones);
+        let mySZ: rect;
         for (let i: number = 0; i < numZones; i++) {
             mySZ = this.EN_SZ[i]; 
             for (let j: number = 0; j < perZone; j++) {
                 [x, y] = LHF.randPos(mySZ);
                 LHF.enemies.push(new Mook(x, y));
             }
-            if (rem--) {
+            if (rem-- > 0) {
                 [x, y] = LHF.randPos(mySZ);
                 LHF.enemies.push(new Mook(x, y));
             }
         }
+        rem = l.thing % numZones;
         perZone = Math.floor(l.thing / numZones); 
         for (let i: number = 0; i < numZones; i++) {
             mySZ = this.EN_SZ[i]; 
@@ -178,7 +179,7 @@ class LHF {
                 [x, y] = LHF.randPos(mySZ);
                 LHF.things.push(new Thing(x, y, LHF.player, LHF.family));
             }
-            if (rem--) {
+            if (rem-- > 0) {
                 [x, y] = LHF.randPos(mySZ);
                 LHF.things.push(new Thing(x, y, LHF.player, LHF.family));
             }
@@ -233,7 +234,7 @@ class LHF {
         }
     }
 
-    private static drawObject(ctx: CanvasRenderingContext2D, o:GameObject): void {
+    private static drawObject(ctx: CanvasRenderingContext2D, o: GameObject): void {
         let [x, y]: [number, number] = o.getPos();
         let [w, h]: [number, number] = o.getSize();
         ctx.fillStyle = o.color;

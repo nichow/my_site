@@ -58,7 +58,7 @@ export class Thing extends Enemy {
     }
 
 
-    public changeTarget(potential: Array<Actor>) {
+    public changeTarget(potential: Array<Actor>): void {
         let _target: Actor = potential.reduce((newTarget, actor) => {
             if (this.distance(newTarget) > this.distance(actor)) {
                 newTarget = actor;
