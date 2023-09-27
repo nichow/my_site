@@ -13,6 +13,8 @@ import { Mother } from './Actors/Family/Mother';
 import { Child } from './Actors/Family/Child';
 import { type Level, mookLevel } from './Levels';
 
+const VERSION = '0.0.1';
+
 type rect = {
     x: number,
     y: number,
@@ -232,6 +234,8 @@ class LHF {
                 break;
             }
         }
+        ctx.font = "bold 16px monospace";
+        ctx.fillText(`VERSION: ${VERSION}`, 85, BG.h - 5);
     }
 
     private static drawObject(ctx: CanvasRenderingContext2D, o: GameObject): void {
